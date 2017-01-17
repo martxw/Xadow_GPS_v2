@@ -54,6 +54,8 @@
 #define GPS_SATE_IN_VIEW_ID		14 // 1 byte
 #define GPS_SATE_IN_VIEW_SIZE	1
 
+#define GPS_RAW_DETAILS_ID		15 // 74 bytes
+#define GPS_RAW_DETAILS_SIZE	sizeof(stru_RawDetails)
 
 
 typedef struct
@@ -118,5 +120,14 @@ void gps_parser(void);
 bool gps_recive_ok(void);
 void gps_data_convert(void);
 
+typedef struct
+{
+	stru_GPSRMC GPS_RMC_Data;
+	stru_GPSGGA GPS_GGA_Data;
+	stru_GPSGSA GPS_GSA_Data;
+}stru_RawDetails;
+
+/* Clone the GPS data here after finishing parsing the GSA sentence. Assuming that GGA & RMC precede it. */
+extern stru_RawDetails stagedRawDetails;
 
 #endif /* SOURCES_GPS_H_ */

@@ -10,8 +10,8 @@
 
 
 uint8_t RegScanData[4] = {0, 0, 0, I2C_DEVICE_ADDR};
-uint8_t TxBuff[DATA_LENGTH] = {0};
-uint8_t RxBuff[DATA_LENGTH] = {0};
+uint8_t TxBuff[TX_DATA_LENGTH] = {0};
+uint8_t RxBuff[RX_DATA_LENGTH] = {0};
 i2c_slave_state_t slave;
 call_param_t callParam;
 i2c_slave_user_config_t userConfig;
@@ -182,6 +182,10 @@ void i2c_slave_callback(uint8_t instance,i2c_slave_event_t i2cEvent,void *param)
 					if(gps_recive_ok())gps_data_convert();
 				break;
 
+				case GPS_RAW_DETAILS_ID:
+					if(i2c_send_count == (GPS_RAW_DETAILS_SIZE+2))i2c_send_count = 0;
+				break;
+
 				default:
 				break;
 			}
@@ -205,7 +209,7 @@ void i2c_slave_callback(uint8_t instance,i2c_slave_event_t i2cEvent,void *param)
 			i2c_comand = userData->pRxBuff[0];
 			i2c_send_count = 0;
 
-    		memset(TxBuff, 0, DATA_LENGTH);
+    		memset(TxBuff, 0, TX_DATA_LENGTH);
 			switch(i2c_comand)
 			{
 				case GPS_SCAN_ID:
@@ -301,6 +305,12 @@ void i2c_slave_callback(uint8_t instance,i2c_slave_event_t i2cEvent,void *param)
 
 				case GPIO_TEST_CMD:
 					sys_gpio_test = 1;
+				break;
+
+				case GPS_RAW_DETAILS_ID:
+					TxBuff[0] = GPS_RAW_DETAILS_ID;
+					TxBuff[1] = GPS_RAW_DETAILS_SIZE;
+					i2c_data_copy(TxBuff + 2, (uint8_t*)&stagedRawDetails, sizeof(stagedRawDetails));
 				break;
 
 				default:

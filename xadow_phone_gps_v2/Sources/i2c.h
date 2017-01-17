@@ -4,7 +4,8 @@
 
 
 #define I2C_DEVICE_ADDR    0x05
-#define DATA_LENGTH    	   18
+#define RX_DATA_LENGTH     18
+#define TX_DATA_LENGTH     80
 
 #define GPIO_TEST_CMD		0x54 // 'T'
 

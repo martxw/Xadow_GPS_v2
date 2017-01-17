@@ -1,5 +1,6 @@
 
 #include <stdbool.h>
+#include <string.h> // memcpy
 #include "board.h"
 #include "gps.h"
 
@@ -21,6 +22,8 @@ stru_GPSRMC GPS_RMC_Data;
 stru_GPSGGA GPS_GGA_Data;
 stru_GPSGSA GPS_GSA_Data;
 stru_GPSGSV GPS_GSV_Data;
+
+stru_RawDetails stagedRawDetails;
 
 unsigned char LatitudeNew[9];    // dd.dddddd
 unsigned char LongitudeNew[10];  // ddd.dddddd
@@ -93,6 +96,12 @@ void gps_data_convert(void)
 		LongitudeNew[i] = Data % 10 + '0';
 		Data = Data / 10;
 	}
+}
+
+static void stageRawDetails(void) {
+	memcpy(&stagedRawDetails.GPS_RMC_Data, &GPS_RMC_Data, sizeof(GPS_RMC_Data));
+	memcpy(&stagedRawDetails.GPS_GGA_Data, &GPS_GGA_Data, sizeof(GPS_GGA_Data));
+	memcpy(&stagedRawDetails.GPS_GSA_Data, &GPS_GSA_Data, sizeof(GPS_GSA_Data));
 }
 
 static void ParserGPGGA(void)
@@ -210,6 +219,7 @@ static void ParserGPGSA(void)
     {
         case '*':
             NMEA_CMD_Start=0;
+            stageRawDetails();	// Finished this sentence so should have consistent data.
             break;
         case ',':
             NMEA_DAT_Block++;
