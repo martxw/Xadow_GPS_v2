@@ -310,7 +310,10 @@ void i2c_slave_callback(uint8_t instance,i2c_slave_event_t i2cEvent,void *param)
 				case GPS_RAW_DETAILS_ID:
 					TxBuff[0] = GPS_RAW_DETAILS_ID;
 					TxBuff[1] = GPS_RAW_DETAILS_SIZE;
-					i2c_data_copy(TxBuff + 2, (uint8_t*)&stagedRawDetails, sizeof(stagedRawDetails));
+					//i2c_data_copy(TxBuff + 2, (uint8_t*)&stagedRawDetails, sizeof(stagedRawDetails));
+					// Switched to memcpy to speed it up.
+					// I had found I needed to put in a 10ms delay before reading the response.
+					memcpy(&TxBuff[2], &stagedRawDetails, sizeof(stagedRawDetails));
 				break;
 
 				default:
